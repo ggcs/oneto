@@ -13,3 +13,5 @@ ipconfig /flushdns
 Android开启飞行模式 -> 关闭飞行模式
 
 通用方法拔网线(断网) -> 插网线(重新连接网络)
+
+工具：SwitchHosts
