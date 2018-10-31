@@ -283,10 +283,10 @@ net.ipv4.ip_forward = 1">>/etc/sysctl.conf
 }
 
 echo -e "${Info} 选择你要使用的功能: "
-echo -e "1.初始化\n2.开启BBR算法\n3.设置中文\n4.设置时区\n5.国内测速\n6.VPS参数\n7.优化网络\n8.清理垃圾\n9.Swap"
+echo -e "1.初始化\n2.开启BBR算法\n3.设置中文和时区\n4.Swap\n5.国内测速\n6.VPS参数\n7.优化网络\n8.清理垃圾"
 read -p "输入数字以选择:" function
 
-while [[ ! "${function}" =~ ^[1-9]$ ]]
+while [[ ! "${function}" =~ ^[1-8]$ ]]
     do
         echo -e "${Error} 无效输入"
         echo -e "${Info} 请重新选择" && read -p "输入数字以选择:" function
@@ -298,20 +298,18 @@ elif [[ "${function}" == "2" ]]; then
     start
 elif [[ "${function}" == "3" ]]; then
     cglang
-elif [[ "${function}" == "4" ]]; then
     cgtime
+elif [[ "${function}" == "4" ]]; then
+    wget -O swap.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/swap.sh && bash swap.sh
 elif [[ "${function}" == "5" ]]; then
     cgspeed
 elif [[ "${function}" == "6" ]]; then
     cgbensh
 elif [[ "${function}" == "7" ]]; then
     optimizing_system
-elif [[ "${function}" == "8" ]]; then
+else
     # detele_kernel
     yum remove $(rpm -qa | grep kernel | grep -v $(uname -r))
     yum clean all
     rpm -qa | grep kernel
-else
-
-    wget -O swap.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/swap.sh && bash swap.sh
 fi
