@@ -224,7 +224,7 @@ ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 }
 
 cglang(){
-wget -O superspeed.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/lang.sh && bash superspeed.sh
+wget -O lang.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/lang.sh && bash lang.sh
 }
 
 cgspeed(){
@@ -283,7 +283,7 @@ net.ipv4.ip_forward = 1">>/etc/sysctl.conf
 }
 
 echo -e "${Info} 选择你要使用的功能: "
-echo -e "1.初始化\n2.开启BBR算法\n3.设置中文\n4.设置时区\n5.国内测速\n6.VPS参数\n7.优化网络\n8.清理垃圾"
+echo -e "1.初始化\n2.开启BBR算法\n3.设置中文\n4.设置时区\n5.国内测速\n6.VPS参数\n7.优化网络\n8.清理垃圾\n9.Swap"
 read -p "输入数字以选择:" function
 
 while [[ ! "${function}" =~ ^[1-8]$ ]]
@@ -306,6 +306,8 @@ elif [[ "${function}" == "6" ]]; then
     cgbensh
 elif [[ "${function}" == "7" ]]; then
     optimizing_system
+elif [[ "${function}" == "9" ]]; then
+    wget -O swap.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/swap.sh && bash swap.sh
 else
     # detele_kernel
     yum remove $(rpm -qa | grep kernel | grep -v $(uname -r))
