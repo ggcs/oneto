@@ -74,6 +74,9 @@ rnd=$(rand 40000 50000)
 # exit 1
 
 sed -i "s/#Port .*/Port $rnd/g" /etc/ssh/sshd_config && systemctl restart sshd.service
+
+yum install firewalld systemd -y
+
 firewall-cmd --permanent --zone=public --add-port=$rnd/tcp
 firewall-cmd --reload
 firewall-cmd --permanent --query-port=$rnd/tcp
