@@ -36,7 +36,7 @@ check_sys(){
 
 check_system(){
 check_sys
-[[ ${release} != "centos" ]]  && echo -e "${Error} 本脚本不支持当前系统 ${release} !" && exit 1
+[[ ${release} == "centos" ]]  && echo -e "${Error} 本脚本不支持当前系统 ${release} !" && exit 1
 }
 
 check_root(){
