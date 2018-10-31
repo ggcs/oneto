@@ -218,13 +218,13 @@ lsmod | grep bbr
 }
 
 cgtime(){
-\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-echo 'Asia/Shanghai' >/etc/timezone
+yum -y install ntpdate
+ntpdate us.pool.ntp.org
+ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 }
 
 cglang(){
-yum -y install kde-l10n-Chinese
-localectl  set-locale LANG=zh_CN.UTF8
+wget -O superspeed.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/lang.sh && bash superspeed.sh
 }
 
 cgspeed(){
