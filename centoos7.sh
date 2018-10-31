@@ -2,7 +2,9 @@
 #################################################
 #   CentOS7初始化脚本
 #   
-#   wget https://raw.githubusercontent.com/IloveJFla/oneto/master/centoos7.sh && bash centoos7.sh
+#   wget -O centoos7.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/centoos7.sh && bash centoos7.sh
+#   wget https://github.com/IloveJFla/oneto/blob/master/centoos7.sh && bash centoos7.sh
+#   
 #################################################
 #
 
@@ -169,7 +171,6 @@ EOF
 sysctl -p
 lsmod | grep bbr
 yum clean all
-
 }
 
 time(){
@@ -177,10 +178,8 @@ ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 }
 
 lang(){
-
 yum -y install kde-l10n-Chinese
 localectl  set-locale LANG=zh_CN.UTF8
-
 }
 
 echo -e "${Info} 选择你要使用的功能: "
