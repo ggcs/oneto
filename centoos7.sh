@@ -38,20 +38,15 @@ check_sys(){
 
 check_system(){
 check_sys
-[[ ${release} == "centos" ]]  && echo -e "${Error} 本脚本不支持当前系统 ${release} !" && exit 1
+[[ ${release} != "centos" ]]  && echo -e "${Error} 本脚本不支持当前系统 ${release} !" && exit 1
 }
 
 check_root(){
-	[[ "`id -u`" != "0" ]] && echo -e "${Error} must be root user !" && exit 1
+    [[ "`id -u`" != "0" ]] && echo -e "${Error} must be root user !" && exit 1
 }
 
 check_kvm(){
-	apt-get update
-	apt-get install -y virt-what
-	apt-get install -y ca-certificates
-	#virt=`virt-what`
-	#[[ "${virt}" = "openvz" ]] && echo -e "${Error} OpenVZ not support !" && exit 1
-	[[ "`virt-what`" != "kvm" ]] && echo -e "${Error} only support KVM !" && exit 1
+    [[ -d "/proc/vz" ]] && echo -e "${red}Error:${plain} Your VPS is based on OpenVZ, which is not supported." && exit 1
 }
 
 
@@ -75,9 +70,8 @@ resize2fs /dev/vda1
 
 rnd=$(rand 40000 50000)
 
-echo "重新连接的端口号为$rnd"
-
-exit 1
+# echo "重新连接的端口号为$rnd"
+# exit 1
 
 sed -i "s/#Port .*/Port $rnd/g" /etc/ssh/sshd_config && systemctl restart sshd.service
 firewall-cmd --permanent --zone=public --add-port=$rnd/tcp
@@ -135,9 +129,6 @@ sudo mkdir -p /usr/local/share/man/man1
 sudo cp rclone.1 /usr/local/share/man/man1/
 sudo mandb 
 
-# cd
-# wget http://cachefly.cachefly.net/100mb.test
-
 
 yum update
 #CentOS 7系统
@@ -163,6 +154,7 @@ start(){
 check_system
 check_root
 check_kvm
+yum clean all
 uname -r
 cat >>/etc/sysctl.conf << EOF
 net.core.default_qdisc=fq
@@ -170,34 +162,50 @@ net.ipv4.tcp_congestion_control=bbr
 EOF
 sysctl -p
 lsmod | grep bbr
-yum clean all
+
+# cd
+# wget http://cachefly.cachefly.net/100mb.test
+
 }
 
-time(){
-ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+cgtime(){
+\cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+echo 'Asia/Shanghai' >/etc/timezone
 }
 
-lang(){
+cglang(){
 yum -y install kde-l10n-Chinese
 localectl  set-locale LANG=zh_CN.UTF8
 }
 
+cgspeed(){
+wget -O superspeed.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/superspeed.sh && bash superspeed.sh
+}
+
+cgbensh(){
+wget -O bench.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/bench.sh && bash bench.sh
+}
+
 echo -e "${Info} 选择你要使用的功能: "
-echo -e "1.初始化\n2.开启BBR算法\n3.设置中文\n4.设置时区"
+echo -e "1.初始化\n2.开启BBR算法\n3.设置中文\n4.设置时区\n5.测速\n6.VPS参数"
 read -p "输入数字以选择:" function
 
-while [[ ! "${function}" =~ ^[1-4]$ ]]
-	do
-		echo -e "${Error} 无效输入"
-		echo -e "${Info} 请重新选择" && read -p "输入数字以选择:" function
-	done
+while [[ ! "${function}" =~ ^[1-6]$ ]]
+    do
+        echo -e "${Error} 无效输入"
+        echo -e "${Info} 请重新选择" && read -p "输入数字以选择:" function
+    done
 
 if   [[ "${function}" == "1" ]]; then
-	install
+    install
 elif [[ "${function}" == "2" ]]; then
-	start
+    start
 elif [[ "${function}" == "3" ]]; then
-	lang
+    cglang
+elif [[ "${function}" == "4" ]]; then
+    cgtime
+elif [[ "${function}" == "5" ]]; then
+    cgspeed
 else
-	time
+    cgbensh
 fi
