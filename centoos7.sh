@@ -268,10 +268,10 @@ net.ipv4.ip_forward = 1">>/etc/sysctl.conf
 }
 
 echo -e "${Info} 选择你要使用的功能: "
-echo -e "1.初始化\n2.开启BBR算法\n3.设置中文\n4.设置时区\n5.国内测速\n6.VPS参数\n7.优化网络"
+echo -e "1.初始化\n2.开启BBR算法\n3.设置中文\n4.设置时区\n5.国内测速\n6.VPS参数\n7.优化网络\n8.清理垃圾"
 read -p "输入数字以选择:" function
 
-while [[ ! "${function}" =~ ^[1-7]$ ]]
+while [[ ! "${function}" =~ ^[1-8]$ ]]
     do
         echo -e "${Error} 无效输入"
         echo -e "${Info} 请重新选择" && read -p "输入数字以选择:" function
@@ -289,6 +289,10 @@ elif [[ "${function}" == "5" ]]; then
     cgspeed
 elif [[ "${function}" == "6" ]]; then
     cgbensh
-else
+elif [[ "${function}" == "7" ]]; then
     optimizing_system
+else
+    detele_kernel
+    yum clean all
+    rpm -qa | grep kernel
 fi
