@@ -2,8 +2,8 @@
 #################################################
 #   CentOS7初始化脚本
 #   
-#   wget -O centoos7.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/centoos7.sh && bash centoos7.sh
-#   wget https://github.com/IloveJFla/oneto/blob/master/centoos7.sh && bash centoos7.sh
+#   wget -O CentOS7.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/CentOS7.sh && bash CentOS7.sh
+#   wget https://github.com/IloveJFla/oneto/blob/master/CentOS7.sh && bash CentOS7.sh
 #   
 #################################################
 #
@@ -103,13 +103,19 @@ make
 make install
 cd
 
-yum -y install gcc gcc-c++ make wget
-yum -y install python-urwid
-wget http://excess.org/speedometer/speedometer-2.8.tar.gz
-tar -zxvvf speedometer-2.8.tar.gz
-cd speedometer-2.8
-python setup.py install
-cd
+
+# yum -y install gcc gcc-c++ make wget
+# yum -y install python-urwid
+# wget http://excess.org/speedometer/speedometer-2.8.tar.gz
+# tar -zxvvf speedometer-2.8.tar.gz
+# cd speedometer-2.8
+# python setup.py install
+# cd
+
+yum -y install epel-release
+yum -y install iftop
+yum -y install nethogs
+
 
 yum -y install wget unzip gcc gcc-c++ openssl-devel
 wget https://github.com/aria2/aria2/releases/download/release-1.34.0/aria2-1.34.0.tar.gz
@@ -119,7 +125,7 @@ cd aria2-1.34.0
 make
 make install
 cd
-aria2c -v
+
 
 yum -y install fuse unzip
 wget https://downloads.rclone.org/rclone-current-linux-amd64.zip
@@ -133,6 +139,7 @@ sudo cp rclone.1 /usr/local/share/man/man1/
 sudo mandb 
 cd
 
+
 yum update
 #CentOS 7系统
 #导入ELRepo公钥
@@ -142,6 +149,14 @@ rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
 yum --enablerepo=elrepo-kernel install kernel-ml -y
 grub2-mkconfig -o /boot/grub2/grub.cfg && grub2-set-default 0
 
+
+clear
+
+nethogs -V
+htop -v
+aria2c -v
+rclone -V
+echo -e "${Info}htop、speedometer、aria2c、rclone成功！"
 echo -e "${Info} 确认内核安装无误后, ${reboot}你的VPS, 开机后再次运行该脚本的第二项！重新连接的端口号为$rnd"
 
     read -e -p "是否现在重启 ? [Y/n] :" yn
@@ -292,7 +307,8 @@ elif [[ "${function}" == "6" ]]; then
 elif [[ "${function}" == "7" ]]; then
     optimizing_system
 else
-    detele_kernel
+    # detele_kernel
+    yum remove $(rpm -qa | grep kernel | grep -v $(uname -r))
     yum clean all
     rpm -qa | grep kernel
 fi
