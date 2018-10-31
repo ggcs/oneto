@@ -128,7 +128,7 @@ sudo chmod 755 /usr/bin/rclone
 sudo mkdir -p /usr/local/share/man/man1
 sudo cp rclone.1 /usr/local/share/man/man1/
 sudo mandb 
-
+cd
 
 yum update
 #CentOS 7系统
