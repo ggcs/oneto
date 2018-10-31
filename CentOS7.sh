@@ -306,11 +306,12 @@ elif [[ "${function}" == "6" ]]; then
     cgbensh
 elif [[ "${function}" == "7" ]]; then
     optimizing_system
-elif [[ "${function}" == "9" ]]; then
-    wget -O swap.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/swap.sh && bash swap.sh
-else
+elif [[ "${function}" == "8" ]]; then
     # detele_kernel
     yum remove $(rpm -qa | grep kernel | grep -v $(uname -r))
     yum clean all
     rpm -qa | grep kernel
+else
+
+    wget -O swap.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/swap.sh && bash swap.sh
 fi
