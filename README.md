@@ -5,7 +5,7 @@
 ## 目前仅有 CentOS7初始化脚本
 
 ```
-wget -O centoos7.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/centoos7.sh && bash centoos7.sh
+wget -O CentOS7.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/CentOS7.sh && bash CentOS7.sh
 ```
 ## 提示错误
 ```
