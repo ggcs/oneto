@@ -3,7 +3,7 @@
 #   CentOS7初始化脚本
 #   
 #   wget -O CentOS7.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/CentOS7.sh && bash CentOS7.sh
-#   wget https://github.com/IloveJFla/oneto/blob/master/CentOS7.sh && bash CentOS7.sh
+#   wget -O CentOS7.sh https://github.com/IloveJFla/oneto/blob/master/CentOS7.sh && bash CentOS7.sh
 #   
 #################################################
 #
@@ -140,6 +140,8 @@ sudo mandb
 cd
 
 
+#bbr
+ 
 yum update
 #CentOS 7系统
 #导入ELRepo公钥
