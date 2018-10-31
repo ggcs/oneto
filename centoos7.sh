@@ -1,6 +1,8 @@
 #!/bin/bash
 #################################################
 #   CentOS7初始化脚本
+#   
+#   wget https://raw.githubusercontent.com/IloveJFla/oneto/master/centoos7.sh && bash centoos7.sh
 #################################################
 #
 
@@ -34,7 +36,7 @@ check_sys(){
 
 check_system(){
 check_sys
-[[ ${release} != "debian" ]] && [[ ${release} != "ubuntu" ]] && echo -e "${Error} 本脚本不支持当前系统 ${release} !" && exit 1
+[[ ${release} != "centos" ]]  && echo -e "${Error} 本脚本不支持当前系统 ${release} !" && exit 1
 }
 
 check_root(){
@@ -70,6 +72,10 @@ check_kvm
 resize2fs /dev/vda1
 
 rnd=$(rand 40000 50000)
+
+echo "重新连接的端口号为$rnd"
+
+exit 1
 
 sed -i "s/#Port .*/Port $rnd/g" /etc/ssh/sshd_config && systemctl restart sshd.service
 firewall-cmd --permanent --zone=public --add-port=$rnd/tcp
@@ -127,8 +133,8 @@ sudo mkdir -p /usr/local/share/man/man1
 sudo cp rclone.1 /usr/local/share/man/man1/
 sudo mandb 
 
-cd
-wget http://cachefly.cachefly.net/100mb.test
+# cd
+# wget http://cachefly.cachefly.net/100mb.test
 
 
 yum update
@@ -140,6 +146,13 @@ rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
 yum --enablerepo=elrepo-kernel install kernel-ml -y
 grub2-mkconfig -o /boot/grub2/grub.cfg && grub2-set-default 0
 echo -e "${Info} 确认内核安装无误后, ${reboot}你的VPS, 开机后再次运行该脚本的第二项！重新连接的端口号为$rnd"
+
+    read -e -p "是否现在重启 ? [Y/n] :" yn
+    [[ -z "${yn}" ]] && yn="y"
+    if [[ $yn == [Yy] ]]; then
+        echo -e "${Info} VPS 重启中..."
+        reboot
+    fi
 
 }
 
@@ -156,8 +169,19 @@ EOF
 sysctl -p
 lsmod | grep bbr
 yum clean all
+
 }
 
+time(){
+ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+}
+
+lang(){
+
+yum -y install kde-l10n-Chinese
+localectl  set-locale LANG=zh_CN.UTF8
+
+}
 
 echo -e "${Info} 选择你要使用的功能: "
 echo -e "1.初始化\n2.开启BBR算法\n3.设置中文\n4.设置时区"
@@ -174,7 +198,7 @@ if   [[ "${function}" == "1" ]]; then
 elif [[ "${function}" == "2" ]]; then
 	start
 elif [[ "${function}" == "3" ]]; then
-	status
+	lang
 else
-	uninstall
+	time
 fi
