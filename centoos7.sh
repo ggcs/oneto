@@ -75,7 +75,7 @@ rnd=$(rand 40000 50000)
 
 sed -i "s/#Port .*/Port $rnd/g" /etc/ssh/sshd_config && systemctl restart sshd.service
 
-yum install firewalld systemd -y
+# yum install firewalld systemd -y
 
 firewall-cmd --permanent --zone=public --add-port=$rnd/tcp
 firewall-cmd --reload
@@ -153,22 +153,52 @@ echo -e "${Info} 确认内核安装无误后, ${reboot}你的VPS, 开机后再�
 
 }
 
+detele_kernel(){
+    if [[ "${release}" == "centos" ]]; then
+        rpm_total=`rpm -qa | grep kernel | grep -v "${kernel_version}" | grep -v "noarch" | wc -l`
+        if [ "${rpm_total}" > "1" ]; then
+            echo -e "检测到 ${rpm_total} 个其余内核，开始卸载..."
+            for((integer = 1; integer <= ${rpm_total}; integer++)); do
+                rpm_del=`rpm -qa | grep kernel | grep -v "${kernel_version}" | grep -v "noarch" | head -${integer}`
+                echo -e "开始卸载 ${rpm_del} 内核..."
+                yum remove -y ${rpm_del}
+                echo -e "卸载 ${rpm_del} 内核卸载完成，继续..."
+            done
+            echo -e "内核卸载完毕，继续..."
+        else
+            echo -e " 检测到 内核 数量不正确，请检查 !" && exit 1
+        fi
+    elif [[ "${release}" == "debian" || "${release}" == "ubuntu" ]]; then
+        deb_total=`dpkg -l | grep linux-image | awk '{print $2}' | grep -v "${kernel_version}" | wc -l`
+        if [ "${deb_total}" > "1" ]; then
+            echo -e "检测到 ${deb_total} 个其余内核，开始卸载..."
+            for((integer = 1; integer <= ${deb_total}; integer++)); do
+                deb_del=`dpkg -l|grep linux-image | awk '{print $2}' | grep -v "${kernel_version}" | head -${integer}`
+                echo -e "开始卸载 ${deb_del} 内核..."
+                apt-get purge -y ${deb_del}
+                echo -e "卸载 ${deb_del} 内核卸载完成，继续..."
+            done
+            echo -e "内核卸载完毕，继续..."
+        else
+            echo -e " 检测到 内核 数量不正确，请检查 !" && exit 1
+        fi
+    fi
+}
 
 start(){
 check_system
 check_root
 check_kvm
-yum clean all
 uname -r
 cat >>/etc/sysctl.conf << EOF
 net.core.default_qdisc=fq
 net.ipv4.tcp_congestion_control=bbr
 EOF
 sysctl -p
-lsmod | grep bbr
 
-# cd
-# wget http://cachefly.cachefly.net/100mb.test
+detele_kernel
+yum clean all
+lsmod | grep bbr
 
 }
 
