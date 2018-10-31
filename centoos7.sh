@@ -138,6 +138,7 @@ rpm --import RPM-GPG-KEY-elrepo.org
 rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
 yum --enablerepo=elrepo-kernel install kernel-ml -y
 grub2-mkconfig -o /boot/grub2/grub.cfg && grub2-set-default 0
+
 echo -e "${Info} 确认内核安装无误后, ${reboot}你的VPS, 开机后再次运行该脚本的第二项！重新连接的端口号为$rnd"
 
     read -e -p "是否现在重启 ? [Y/n] :" yn
@@ -186,11 +187,58 @@ cgbensh(){
 wget -O bench.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/bench.sh && bash bench.sh
 }
 
+#优化系统配置
+optimizing_system(){
+    sed -i '/fs.file-max/d' /etc/sysctl.conf
+    sed -i '/fs.inotify.max_user_instances/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_syncookies/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_fin_timeout/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_tw_reuse/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_max_syn_backlog/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.ip_local_port_range/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_max_tw_buckets/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.route.gc_timeout/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_synack_retries/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_syn_retries/d' /etc/sysctl.conf
+    sed -i '/net.core.somaxconn/d' /etc/sysctl.conf
+    sed -i '/net.core.netdev_max_backlog/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_timestamps/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_max_orphans/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.ip_forward/d' /etc/sysctl.conf
+    echo "fs.file-max = 1000000
+fs.inotify.max_user_instances = 8192
+net.ipv4.tcp_syncookies = 1
+net.ipv4.tcp_fin_timeout = 30
+net.ipv4.tcp_tw_reuse = 1
+net.ipv4.ip_local_port_range = 1024 65000
+net.ipv4.tcp_max_syn_backlog = 16384
+net.ipv4.tcp_max_tw_buckets = 6000
+net.ipv4.route.gc_timeout = 100
+net.ipv4.tcp_syn_retries = 1
+net.ipv4.tcp_synack_retries = 1
+net.core.somaxconn = 32768
+net.core.netdev_max_backlog = 32768
+net.ipv4.tcp_timestamps = 0
+net.ipv4.tcp_max_orphans = 32768
+# forward ipv4
+net.ipv4.ip_forward = 1">>/etc/sysctl.conf
+    sysctl -p
+    echo "*               soft    nofile           1000000
+*               hard    nofile          1000000">/etc/security/limits.conf
+    echo "ulimit -SHn 1000000">>/etc/profile
+    read -p "需要重启VPS后，才能生效系统优化配置，是否现在重启 ? [Y/n] :" yn
+    [ -z "${yn}" ] && yn="y"
+    if [[ $yn == [Yy] ]]; then
+        echo -e "${Info} VPS 重启中..."
+        reboot
+    fi
+}
+
 echo -e "${Info} 选择你要使用的功能: "
-echo -e "1.初始化\n2.开启BBR算法\n3.设置中文\n4.设置时区\n5.测速\n6.VPS参数"
+echo -e "1.初始化\n2.开启BBR算法\n3.设置中文\n4.设置时区\n5.国内测速\n6.VPS参数\n7.优化网络"
 read -p "输入数字以选择:" function
 
-while [[ ! "${function}" =~ ^[1-6]$ ]]
+while [[ ! "${function}" =~ ^[1-7]$ ]]
     do
         echo -e "${Error} 无效输入"
         echo -e "${Info} 请重新选择" && read -p "输入数字以选择:" function
@@ -206,6 +254,8 @@ elif [[ "${function}" == "4" ]]; then
     cgtime
 elif [[ "${function}" == "5" ]]; then
     cgspeed
-else
+elif [[ "${function}" == "6" ]]; then
     cgbensh
+else
+    optimizing_system
 fi
