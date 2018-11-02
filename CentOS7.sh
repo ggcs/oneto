@@ -2,8 +2,10 @@
 #################################################
 #   CentOS7初始化脚本
 #   
+#   yum -y install screen zip unzip curl curl-devel wget 
 #   wget -O CentOS7.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/CentOS7.sh && bash CentOS7.sh
 #   wget -O CentOS7.sh https://github.com/IloveJFla/oneto/blob/master/CentOS7.sh && bash CentOS7.sh
+#   bash -c "$(curl -sS https://raw.githubusercontent.com/IloveJFla/oneto/master/CentOS7.sh)"
 #   
 #################################################
 #
@@ -89,12 +91,11 @@ firewall-cmd --reload
 firewall-cmd --permanent --list-port
 systemctl restart sshd
 
-
+# mkdir htop
+# cd htop
 yum install screen zip unzip curl curl-devel wget -y
 yum -y install gcc gcc-c++ kernel-devel
 yum install -y ncurses-devel
-mkdir htop
-cd htop
 wget https://hisham.hm/htop/releases/2.2.0/htop-2.2.0.tar.gz
 tar zxvf htop-2.2.0.tar.gz
 cd htop-2.2.0
