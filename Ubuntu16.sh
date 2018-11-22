@@ -14,6 +14,7 @@ reboot="${Yellow_font}重启${Font_suffix}"
 echo -e "${Green_font}
 #================================================
 #              Ubuntu初始化脚本
+#            2018-11-22 21:03
 #================================================
 ${Font_suffix}"
 
@@ -50,7 +51,8 @@ check_kvm(){
 
 
 
-install(){
+
+initialization(){
 
 check_system
 check_root
@@ -96,10 +98,29 @@ chown vnstat:vnstat /var/lib/vnstat/.${ip_ver}
 chown vnstat:vnstat /var/lib/vnstat/${ip_ver}
 systemctl start vnstat
 
+#编译安装aria2
+apt-get -y install build-essential
+apt-get -y install software-properties-common
+add-apt-repository ppa:ubuntu-toolchain-r/test -y
+apt-get update -y
+apt-get -y install make gcc-6 g++6
+
+sudo apt-get install gcc-6 g++-6 -y && \
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /usr/bin/g++ g++ /usr/bin/g++-6 && \
+sudo update-alternatives --config gcc
+
+apt-get install -y libcurl4-openssl-dev libevent-dev ca-certificates pkg-config build-essential intltool libgcrypt-dev libssl-dev libxml2-dev
+apt-get install -y libssl-dev libgcrypt-dev libssh2-1-dev libc-ares-dev libexpat1-dev zlib1g-dev libsqlite3-dev pkg-config
+
+wget --no-check-certificate https://github.com/aria2/aria2/releases/download/release-1.34.0/aria2-1.34.0.tar.gz
+tar zxf aria2-1.34.0.tar.gz
+cd ./aria2-1.34.0
+./configure
+make
+make install
+cd
+
 apt-get install fuse unzip -y
-
-# wget https://rclone.org/install.sh | sudo bash
-
 wget https://downloads.rclone.org/rclone-current-linux-amd64.zip
 unzip rclone-current-linux-amd64.zip
 cd rclone-*-linux-amd64
@@ -110,11 +131,17 @@ sudo mkdir -p /usr/local/share/man/man1
 sudo cp rclone.1 /usr/local/share/man/man1/
 sudo mandb 
 cd
+
+sudo apt-get autoclean
+sudo apt-get clean
+sudo apt-get autoremove
+clear
+
+aria2c -v
 rclone -V 
-# rclone config
 
 
-echo -e "${Info} vnstat rclone htop speedometer安装成功！, 重新连接的端口号为$rnd"
+echo -e "${Info} vnstat rclone htop speedometer aria2安装成功！, 重新连接的端口号为$rnd"
 
 }
 
@@ -122,7 +149,7 @@ BBRinstall(){
 
 apt install --install-recommends linux-generic-hwe-16.04 -y
 
-echo -e "${Info} 确认内核安装无误后, ${reboot}你的VPS, 开机后再次运行该脚本的第二项！重新连接的端口号为$rnd"
+echo -e "${Info} 确认内核安装无误后, ${reboot}你的VPS, 开机后再次运行该脚本的第二项！"
 
     read -e -p "是否现在重启 ? [Y/n] :" yn
     [[ -z "${yn}" ]] && yn="y"
@@ -136,17 +163,19 @@ check_system
 check_root
 check_kvm
 
+remove_all
 sudo modprobe tcp_bbr
 echo "tcp_bbr" | sudo tee --append /etc/modules-load.d/modules.conf
 echo "net.core.default_qdisc=fq" | sudo tee --append /etc/sysctl.conf
 echo "net.ipv4.tcp_congestion_control=bbr" | sudo tee --append /etc/sysctl.conf
 sysctl -p
+clear
 sysctl net.ipv4.tcp_available_congestion_control
 sysctl net.ipv4.tcp_congestion_control
 echo -e "${Info}BBR启动成功！"
 }
 
-BBRmodinstall(){
+MBBRinstall(){
 check_system
 check_root
 check_kvm
@@ -176,30 +205,39 @@ echo -e "${Info} 确认内核安装无误后, ${reboot}你的VPS, 开机后再�
 }
 
 
-BBRmodstart(){
+MBBRstart(){
+remove_all
+apt-get update -y
+apt-get -y install build-essential
+apt-get -y install software-properties-common
+add-apt-repository ppa:ubuntu-toolchain-r/test -y
+apt-get update -y
+apt-get -y install make gcc-6
 
-# echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
-# echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
-# sysctl -p
-# sysctl net.ipv4.tcp_available_congestion_control
+# mkdir bbrmod && cd bbrmod
+# wget -N --no-check-certificate https://raw.githubusercontent.com/IloveJFla/oneto/master/BBRnanqinlang/tcp_nanqinlang.c
+# echo "obj-m := tcp_nanqinlang.o" > Makefile
+# make -C /lib/modules/$(uname -r)/build M=`pwd` modules CC=/usr/bin/gcc-6
+# install tcp_nanqinlang.ko /lib/modules/$(uname -r)/kernel
+# cp -rf ./tcp_nanqinlang.ko /lib/modules/$(uname -r)/kernel/net/ipv4
+# depmod -a
 
-apt-get update
-if [[ "${release}" == "ubuntu" && "${version}" = "14" ]]; then
-    apt-get -y install build-essential
-    apt-get -y install software-properties-common
-    add-apt-repository ppa:ubuntu-toolchain-r/test -y
-    apt-get update
-fi
-apt-get -y install make gcc-4.9
-mkdir bbrmod && cd bbrmod
-wget -N --no-check-certificate https://raw.githubusercontent.com/IloveJFla/oneto/master/BBRnanqinlang/tcp_nanqinlang.c
-echo "obj-m := tcp_nanqinlang.o" > Makefile
-make -C /lib/modules/$(uname -r)/build M=`pwd` modules CC=/usr/bin/gcc-4.9
-install tcp_nanqinlang.ko /lib/modules/$(uname -r)/kernel
-cp -rf ./tcp_nanqinlang.ko /lib/modules/$(uname -r)/kernel/net/ipv4
-depmod -a
-
-echo -e "${Info}魔改BBR启动成功！"
+#     echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
+#     echo "net.ipv4.tcp_congestion_control=nanqinlang" >> /etc/sysctl.conf
+#     sysctl -p
+    
+echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
+sysctl -p
+mkdir tcp_nanqinlang
+cd tcp_nanqinlang
+wget -N https://raw.githubusercontent.com/IloveJFla/oneto/master/BBRnanqinlang/tcp_nanqinlang.c
+wget -N https://raw.githubusercontent.com/IloveJFla/oneto/master/BBRnanqinlang/Makefile
+make && make install
+clear
+sysctl net.ipv4.tcp_available_congestion_control
+lsmod | grep bbr
+echo -e "${Info}魔改版BBR启动成功！"
 }
 
 
@@ -392,7 +430,7 @@ case "$num" in
     cgtime
     ;;
     1)
-    install
+    initialization
     ;;
     2)
     BBRinstall
@@ -401,10 +439,10 @@ case "$num" in
     BBRstart
     ;;
     4)
-    BBRmodinstall
+    MBBRinstall
     ;;
     5)
-    BBRmodstart
+    MBBRstart
     ;;
     6)
     cgspeed
