@@ -372,10 +372,10 @@ net.ipv4.ip_forward = 1">>/etc/sysctl.conf
 }
 
 echo -e "${Info} 选择你要使用的功能: "
-echo -e "1.初始化\n2.安装BBR\n3.开启BBR\n4.设置中文和时区\n5.国内测速\n6.VPS参数\n7.优化网络\n8.清理垃圾\n9.安装魔改BBR\n10.开启魔改BBR"
+echo -e "1.初始化\n2.安装BBR\n3.开启BBR\n4.设置中文和时区\n5.国内测速\n6.VPS参数\n7.优化网络\n8.清理垃圾\n0.安装魔改BBR\n9.开启魔改BBR"
 read -p "输入数字以选择:" function
 
-while [[ ! "${function}" =~ ^[1-10]$ ]]
+while [[ ! "${function}" =~ ^[0-9]$ ]]
     do
         echo -e "${Error} 无效输入"
         echo -e "${Info} 请重新选择" && read -p "输入数字以选择:" function
@@ -402,7 +402,7 @@ sudo apt-get autoclean -y
 sudo apt-get clean -y
 sudo apt-get autoremove -y
 sudo dpkg -l 'linux-*' | sed '/^ii/!d;/'"$(uname -r | sed "s/\(.*\)-\([^0-9]\+\)/\1/")"'/d;s/^[^ ]* [^ ]* \([^ ]*\).*/\1/;/[0-9]/!d' | xargs sudo apt-get -y purge
-elif [[ "${function}" == "9" ]]; then
+elif [[ "${function}" == "0" ]]; then
     BBRmodinstall
 else
     BBRmodstart
