@@ -2,11 +2,17 @@
 
 ------
 
-## 目前仅有 CentOS7初始化脚本
+## CentOS7初始化脚本
 
 ```
-wget -O CentOS7.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/CentOS7.sh && bash CentOS7.sh
+wget -O CentOS7.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/CentOS7.sh && chmod a+x CentOS7.sh && bash CentOS7.sh
 ```
+## Ubuntu16初始化脚本
+
+```
+wget -O Ubuntu16.sh https://raw.githubusercontent.com/IloveJFla/oneto/master/Ubuntu16.sh && chmod a+x Ubuntu16.sh && bash Ubuntu16.sh
+```
+
 ## 提示错误
 ```
 # CentOS系统:
