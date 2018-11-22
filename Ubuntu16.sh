@@ -371,39 +371,61 @@ net.ipv4.ip_forward = 1">>/etc/sysctl.conf
     fi
 }
 
-echo -e "${Info} 选择你要使用的功能: "
-echo -e "1.初始化\n2.安装BBR\n3.开启BBR\n4.设置中文和时区\n5.国内测速\n6.VPS参数\n7.优化网络\n8.清理垃圾\n0.安装魔改BBR\n9.开启魔改BBR"
-read -p "输入数字以选择:" function
-
-while [[ ! "${function}" =~ ^[0-9]$ ]]
-    do
-        echo -e "${Error} 无效输入"
-        echo -e "${Info} 请重新选择" && read -p "输入数字以选择:" function
-    done
-
-if   [[ "${function}" == "1" ]]; then
-    install
-elif [[ "${function}" == "2" ]]; then
-    BBRinstall
-elif [[ "${function}" == "3" ]]; then
-     BBRstart
-elif [[ "${function}" == "4" ]]; then
-    cglang
-    cgtime
-elif [[ "${function}" == "5" ]]; then
-    cgspeed
-elif [[ "${function}" == "6" ]]; then
-    cgbensh
-elif [[ "${function}" == "7" ]]; then
-    optimizing_system
-elif [[ "${function}" == "8" ]]; then
+cleanlj(){
 detele_kernel
 sudo apt-get autoclean -y
 sudo apt-get clean -y
 sudo apt-get autoremove -y
 sudo dpkg -l 'linux-*' | sed '/^ii/!d;/'"$(uname -r | sed "s/\(.*\)-\([^0-9]\+\)/\1/")"'/d;s/^[^ ]* [^ ]* \([^ ]*\).*/\1/;/[0-9]/!d' | xargs sudo apt-get -y purge
-elif [[ "${function}" == "0" ]]; then
+}
+
+
+start_menu(){
+clear
+echo -e "${Info} 选择你要使用的功能: "
+echo -e "0.设置中文和时区\n1.初始化\n2.安装BBR\n3.开启BBR\n4.安装魔改BBR\n5.开启魔改BBR\n6.国内测速\n7.VPS参数\n8.优化网络\n9.清理垃圾"
+echo
+read -p " 请输入数字 [0-9]:" num
+case "$num" in
+    0)
+    cglang
+    cgtime
+    ;;
+    1)
+    install
+    ;;
+    2)
+    BBRinstall
+    ;;
+    3)
+    BBRstart
+    ;;
+    4)
     BBRmodinstall
-else
+    ;;
+    5)
     BBRmodstart
-fi
+    ;;
+    6)
+    cgspeed
+    ;;
+    7)
+    cgbensh
+    ;;
+    8)
+    optimizing_system
+    ;;
+    9)
+cleanlj
+    ;;
+    *)
+    clear
+    echo -e "${Error}:请输入正确数字 [0-9]"
+    sleep 5s
+    start_menu
+    ;;
+esac
+}
+
+
+start_menu
