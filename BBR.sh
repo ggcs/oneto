@@ -1,7 +1,7 @@
 #!/bin/bash
 
 [ "$EUID" -ne '0' ] && echo "Error,This script must be run as root! " && exit 1
-[ $# -gt '1' ] && [ "$1" == '-f' ] && tmpKernelVer="$2" || tmpKernelVer='v4.12.9';
+[ $# -gt '1' ] && [ "$1" == '-f' ] && tmpKernelVer="$2" || tmpKernelVer='v4.14.12';
 KernelVer='';
 KernelBitVer='';
 [ -z "$(dpkg -l |grep 'grub-')" ] && echo "Not found grub." && exit 1
