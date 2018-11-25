@@ -1,4 +1,3 @@
-LocaleCN.sh
 
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
@@ -74,4 +73,4 @@ echo ""
 
 # Delete self
 cd ${dir}
-rm -rf LocaleCN.sh
+rm -rf lang.sh
