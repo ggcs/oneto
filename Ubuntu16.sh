@@ -7,6 +7,7 @@
 #   
 #################################################
 #
+clear
 Green_font="\033[32m" && Yellow_font="\033[33m" && Red_font="\033[31m" && Font_suffix="\033[0m"
 Info="${Green_font}[Info]${Font_suffix}"
 Error="${Red_font}[Error]${Font_suffix}"
@@ -14,7 +15,7 @@ reboot="${Yellow_font}重启${Font_suffix}"
 echo -e "${Green_font}
 #================================================
 #              Ubuntu初始化脚本
-#            2018-11-22 21:03
+#            2018-11-27 17:03
 #================================================
 ${Font_suffix}"
 
@@ -58,6 +59,7 @@ check_system
 check_root
 check_kvm
 
+sudo rm -rf /var/lib/dpkg/lock
 resize2fs /dev/vda1
 
 
@@ -81,7 +83,9 @@ rnd=$(rand 40000 50000)
 # echo "重新连接的端口号为$rnd"
 # exit 1
 
-sed -i "s/Port .*/Port $rnd/g" /etc/ssh/sshd_config && service ssh restart
+# sed -i "s/Port .*/Port $rnd/g" /etc/ssh/sshd_config && service ssh restart
+
+sed -i "s/Port .*/Port 25678/g" /etc/ssh/sshd_config && service ssh restart
 
 
 
@@ -99,19 +103,17 @@ chown vnstat:vnstat /var/lib/vnstat/${ip_ver}
 systemctl start vnstat
 
 #编译安装aria2
+
+apt-get update -y
 apt-get -y install build-essential
 apt-get -y install software-properties-common
 add-apt-repository ppa:ubuntu-toolchain-r/test -y
 apt-get update -y
-apt-get -y install make gcc-6 g++6
-
-sudo apt-get install gcc-6 g++-6 -y && \
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /usr/bin/g++ g++ /usr/bin/g++-6 && \
+sudo apt-get install make gcc-6 g++6 -y && \
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /usr/bin/g++ g++ /usr/bin/g++6 && \
 sudo update-alternatives --config gcc
-
 apt-get install -y libcurl4-openssl-dev libevent-dev ca-certificates pkg-config build-essential intltool libgcrypt-dev libssl-dev libxml2-dev
 apt-get install -y libssl-dev libgcrypt-dev libssh2-1-dev libc-ares-dev libexpat1-dev zlib1g-dev libsqlite3-dev pkg-config
-
 wget --no-check-certificate https://github.com/aria2/aria2/releases/download/release-1.34.0/aria2-1.34.0.tar.gz
 tar zxf aria2-1.34.0.tar.gz
 cd ./aria2-1.34.0
@@ -132,9 +134,9 @@ sudo cp rclone.1 /usr/local/share/man/man1/
 sudo mandb 
 cd
 
-sudo apt-get autoclean
-sudo apt-get clean
-sudo apt-get autoremove
+sudo apt-get autoclean -y
+sudo apt-get clean -y
+sudo apt-get autoremove -y
 clear
 
 aria2c -v
@@ -419,7 +421,7 @@ sudo dpkg -l 'linux-*' | sed '/^ii/!d;/'"$(uname -r | sed "s/\(.*\)-\([^0-9]\+\)
 
 
 start_menu(){
-clear
+
 echo -e "${Info} 选择你要使用的功能: "
 echo -e "0.设置中文和时区\n1.初始化\n2.安装BBR\n3.开启BBR\n4.安装魔改BBR\n5.开启魔改BBR\n6.国内测速\n7.VPS参数\n8.优化网络\n9.清理垃圾"
 echo
